@@ -32,6 +32,8 @@ from functools import partial, wraps
 from threading import Thread
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 from zipfile import is_zipfile
+from torch.distributions import constraints
+
 
 import torch
 from huggingface_hub import split_torch_state_dict_into_shards
@@ -2445,6 +2447,7 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin, GenerationMixin, PushToHubMix
         is_covariance_psd = bool(
             (covariance == covariance.T).all() and not torch.is_complex(eigenvalues) and (eigenvalues > 0).all()
         )
+        print(is_covariance_psd)
         if is_covariance_psd:
             # If covariances is positive definite, a distribution can be created. and we can sample new weights from it.
             distribution = torch.distributions.multivariate_normal.MultivariateNormal(
@@ -2458,6 +2461,7 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin, GenerationMixin, PushToHubMix
             new_embeddings.weight.data[-1 * added_num_tokens :, :] = (
                 mean_embeddings[None, :].repeat(added_num_tokens, 1).to(old_embeddings.weight.dtype)
             )
+        assert 1==0
 
     def _init_added_lm_head_weights_with_mean(
         self,
